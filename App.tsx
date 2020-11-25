@@ -25,10 +25,33 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import Realm from 'realm';
+import {Room, schema} from './realm';
 
 declare const global: {HermesInternal: null | {}};
 
 const App = () => {
+  (async () => {
+    const realm = await Realm.open({
+      schema,
+      inMemory: false,
+    });
+    console.debug('realm path:', realm.path);
+    realm.write(() => {
+      const created = realm.create<Room>(Room.schema.name, {
+        id: `${new Date()}`,
+        name: 'a',
+        description: 'a',
+        users: [],
+        messages: [],
+      });
+      console.log('created:', created);
+    });
+    console.log(1);
+    const rooms = realm.objects(Room.schema.name);
+    console.log('rooms:', rooms);
+    console.log(2);
+  })();
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -46,8 +69,8 @@ const App = () => {
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Step One</Text>
               <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-                screen and then come back to see your edits.
+                Edit <Text style={styles.highlight}>App.tsx</Text> to change
+                this screen and then come back to see your edits.
               </Text>
             </View>
             <View style={styles.sectionContainer}>
